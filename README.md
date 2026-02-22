@@ -1,54 +1,185 @@
-# StockPicker Crew
+# 📈 StockPicker AI
 
-Welcome to the StockPicker Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+### Autonomous Multi-Agent Investment Research System Built with CrewAI
 
-## Installation
+**StockPicker AI** is a production-oriented multi-agent system that autonomously discovers trending companies, performs deep financial analysis, selects the strongest investment candidates, and distributes results via email—all while persisting intelligence across sessions using a layered memory architecture.
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+This project demonstrates applied AI orchestration, structured reasoning, hierarchical delegation, and persistent memory design using the **CrewAI** framework.
 
-First, if you haven't already, install uv:
+---
 
+## 🚀 Why This Project Stands Out
+
+Unlike simple LLM demos, this system showcases:
+
+- 🧠 **Multi-agent coordination** with hierarchical delegation.
+- 📊 **Structured financial research** using typed Pydantic models.
+- 🧩 **Tool-augmented reasoning** (search + email automation).
+- 💾 **Persistent long-term memory** with SQLite.
+- 🔎 **Retrieval-Augmented Generation (RAG)** memory.
+- 🏗 **Clean separation** of agents, tasks, tools, and configuration.
+- 📈 **Production-aware architecture** decisions.
+
+*This is not just a prompt script — it is a fully orchestrated AI system.*
+
+---
+
+## 🏗 System Architecture
+
+### 🔹 Execution Model
+The system operates using a **Hierarchical Process** (`Process.hierarchical`). 
+
+In this model:
+1. **Manager Agent**: Oversees the entire workflow and delegates tasks.
+2. **Worker Agents**: Execute specific investigative or technical tasks.
+3. **Aggregation**: Results are refined by the manager before being stored or distributed.
+
+This mirrors real-world organizational structures and enables advanced reasoning workflows.
+
+### 👥 Agent Roles & Capabilities
+
+| Agent | Responsibility | Tools Used |
+| :--- | :--- | :--- |
+| **Trending Company Finder** | Identifies companies trending in news/market | `SerperDevTool` |
+| **Financial Researcher** | Performs deep market & competitive research | `SerperDevTool` |
+| **Stock Picker** | Selects best investment & compiles reports | `Custom Email Tool` |
+| **Manager** | Delegates, oversees, and validates execution | — |
+
+---
+
+## 📊 Structured AI Outputs
+
+All task outputs are validated using **Pydantic models**, ensuring:
+- **Deterministic responses:** No random unstructured text.
+- **Type safety:** Reliable hand-offs between agents.
+- **Hallucination reduction:** Forced adherence to data schemas.
+
+```python
+class TrendingCompany(BaseModel):
+    name: str
+    ticker: str
+    reason: str
+```
+This transforms unstructured LLM text into reliable, machine-readable data.
+
+---
+
+## 🧠 Memory Architecture (Core Differentiator)
+
+StockPicker AI uses three distinct memory layers to ensure it learns over time:
+
+1. **Short-Term Memory (RAG-Based)**: Maintains contextual continuity during a single execution run using OpenAI embeddings.
+2. **Long-Term Memory (SQLite)**: Persists knowledge across different runs (Stored in `./memory/long_term_memory_storage.db`).
+3. **Entity Memory**: Tracks company-specific knowledge and builds contextual relationships between different market entities.
+
+> **Why This Matters:** Most AI demos are stateless. This system evolves and retains insights from previous research sessions.
+
+---
+
+## 🛠 Tools & Integration
+
+- **🔎 SerperDevTool**: Used for real-time news discovery and market positioning research.
+- **📧 Custom SMTP Email Tool**: Used by the Stock Picker agent to automate the delivery of structured investment reports.
+
+### Environment Variables
+To run this system, you need the following keys:
 ```bash
-pip install uv
+export OPENAI_API_KEY="your_key"
+export SERPER_API_KEY="your_key"
+export EMAIL_USER="your_email"
+export EMAIL_PASS="your_app_password"
 ```
 
-Next, navigate to your project directory and install the dependencies:
+---
 
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
+## 📁 Project Structure
+
+```text
+stockpicker/
+│
+├── output/                          # Output files
+│   ├── decision.md                  # Final decision
+│   ├── research_report.json         # Final report
+│   ├── trending_companies.json      # Summary of the research
+├── config/
+│   ├── agents.yaml      # Agent personality and goal definitions
+│   ├── tasks.yaml       # Task descriptions and expected outputs
+│
+├── tools/
+│   ├── custom_tool.py   # Custom SMTP Email implementation
+│
+├── memory/
+│   ├── long_term_memory_storage.db
+│
+├── crew.py              # Core logic and crew definition
+├── main.py              # Entry point
+└── README.md            # You are here
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+---
 
-- Modify `src/stock_picker/config/agents.yaml` to define your agents
-- Modify `src/stock_picker/config/tasks.yaml` to define your tasks
-- Modify `src/stock_picker/crew.py` to add your own logic, tools and specific args
-- Modify `src/stock_picker/main.py` to add custom inputs for your agents and tasks
+## 🔄 Execution Flow
 
-## Running the Project
+1. **Discover** trending companies from live news feeds.
+2. **Generate** a structured list of candidates.
+3. **Perform** detailed financial and market research.
+4. **Evaluate** investment potential based on competitive data.
+5. **Select** the strongest candidate.
+6. **Email** the final report.
+7. **Persist** all findings into long-term memory for future runs.
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+---
 
-```bash
-$ crewai run
-```
+## 🧩 Engineering Decisions
 
-This command initializes the stock_picker Crew, assembling the agents and assigning them tasks as defined in your configuration.
+- **Hierarchical Mode**: Chosen to improve coordination logic and enable the system to scale better than rigid sequential pipelines.
+- **Structured Outputs**: Ensuring every agent output is a validated object makes the system reliable for production integration.
+- **Multi-Layered Memory**: Essential for creating a "research agent" that doesn't start from zero every morning.
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+---
 
-## Understanding Your Crew
+## 📈 Potential Extensions
 
-The stock_picker Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+- Portfolio performance tracking
+- Risk-adjusted scoring algorithms
+- Sentiment analysis integration (Twitter/Reddit)
+- Automated weekly reporting scheduler
+- Dockerized deployment for cloud execution
+- Vector database integration (Pinecone / Weaviate)
 
-## Support
+---
 
-For support, questions, or feedback regarding the StockPicker Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+## 🏁 How to Run
 
-Let's create wonders together with the power and simplicity of crewAI.
+1. **Install Dependencies**:
+   ```bash
+   pip install crewai crewai-tools openai pydantic
+   ```
+2. **Run the System**:
+   ```bash
+   crewai run 
+   ```
+
+---
+
+## 📚 Skills Demonstrated
+
+- Multi-agent system design
+- CrewAI orchestration
+- Retrieval-Augmented Generation (RAG)
+- Memory architecture design
+- Structured AI outputs (Pydantic)
+- Tool integration & Automation
+- Production-oriented AI engineering
+
+---
+
+## 📜 License
+This project is licensed under the **MIT License**.
+
+## 👤 Author
+**Agasthyanath G S**  
+*AI Engineer & Architecture Enthusiast*
+
+---
+*If you're interested in discussing multi-agent AI systems, orchestration frameworks, or applied LLM architecture, feel free to connect!*
