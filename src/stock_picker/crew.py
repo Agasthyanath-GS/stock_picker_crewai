@@ -3,7 +3,7 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
 from pydantic import BaseModel, Field
 from typing import List
-
+from .tools.custom_tool import email_tool
 import pydantic_core
 
 
@@ -53,7 +53,7 @@ class StockPicker():
     def stock_picker(self) -> Agent:
         return Agent(
             config=self.agents_config['stock_picker'], # type: ignore[index]
-            verbose=True , 
+            verbose=True , tools = [email_tool()]
         )
 
     @task
